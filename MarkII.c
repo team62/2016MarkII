@@ -170,6 +170,7 @@ task prettyLights() {
 
 /** Autonomous task - 15 seconds **/
 task autonomous() {
+	SensorValue[gyro] = 0; //Calibrates Gyro
   clearTimer(T1);
   startTask(catapultKickUserLoad);
   while(time1[T1]<5000) {}
