@@ -16,30 +16,36 @@
 
 #include "Vex_Competition_Includes.c"   //Main competition background code...do not modify!
 
+/** Sets the speeds of all wheels. **/
 void setWheelSpeeds (int left, int right) {
   setLeftWheelSpeeds(left);
   setRightWheelSpeeds(right);
 }
 
+/** Sets the speeds of all the left wheels. **/
 void setLeftWheelSpeed (int speed) {
   motor[leftWheel1]   = speed;
   motor[leftWheel2]   = speed;
   motor[leftWheel3]   = speed;
 }
 
+/** Sets the speeds of all the right wheels. **/
 void setRightWheelSpeed (int speed) {
   motor[rightWheel1]  = speed;
   motor[rightWheel2]  = speed;
   motor[rightWheel3]  = speed;
 }
 
+/** Sets all the catapult motors. **/
 void setCatapultSpeed (int speed) {
   motor[cataput1]     = speed;
   motor[cataput2]     = speed;
   motor[cataput3]     = speed;
 }
 
+/** Controlls the drivebase. **/
 void tankDrive () {
+
   //left wheels
   if(abs(vexRT(Ch3))<10) //deadbands
     setLeftWheelSpeed(0);
@@ -53,6 +59,7 @@ void tankDrive () {
     setRightWheelSpeed(vexRT(Ch2));
 }
 
+/** Controlls the intake for balls. Currently not toggle, can easialy be. **/
 void intake() {
   if(VexRT(Btn5U))
     motor[intake] = 127;
@@ -62,11 +69,14 @@ void intake() {
     motor[intake] = 0;
 }
 
+/** Pre autonomous task (who actually uses this?).
+May put in some pretty flashing indicator lights **/
 void pre_auton() {
   bStopTasksBetweenModes = true;
 
 }
 
+/** Controlls the cataptult for regular field use **/
 int catapultDelay = 20; //delay for cycle to start reading sensor
 task catapultKick() {
   while(true) {
@@ -80,7 +90,8 @@ task catapultKick() {
   }
 }
 
-int ballLoadDelay = 300;
+/** Controlls the catapult for driver loads and autonomous **/
+int ballLoadDelay = 1000; //Delay for the ball to be loaded by human driver.
 task catapultKickUserLoad() {
   while(true) {
     setCatapultSpeed(127);
@@ -92,6 +103,7 @@ task catapultKickUserLoad() {
   }
 }
 
+/** Autonomous task - 15 seconds **/
 task autonomous() {
   ClearTimer(T1);
   startTask(catapultKickUserLoad);
@@ -113,6 +125,7 @@ Btn8D             = run driver load shooter (basically full auto) - don’t have
 Btn8U             = stop driver load shooter
 Btn7D             = auto align with gyro (not necessary yet)
 */
+/** Usercontrol task **/
 task usercontrol() {
   while (true) {
     if(VexRT(Btn6U))
@@ -126,6 +139,8 @@ task usercontrol() {
     //Add Gyro - 7D
 
     tankDrive();
+
+    intake();
 
     //Anywhere from 25-50 Msec pause to prevent cortex overload
     wait1Msec(30);
