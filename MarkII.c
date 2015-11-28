@@ -160,12 +160,13 @@ void pre_auton() {
 
 }
 
-/** Autonomous task - 15 seconds **/
+/** Autonomous task - 15 seconds.
+    Moves forward after shooting driver loads **/
 task autonomous() {
 	SensorValue[gyro] = 0; //Calibrates Gyro
   clearTimer(T1);
   startTask(catapultKickUserLoad);
-  while(time1[T1]<5000) {}
+  while(time1[T1]<5000) {} //Time to wait for shooting, needs to be as small as possible
   stopTask(catapultKickUserLoad);
   setWheelSpeeds(127,127);
   wait1Msec(1100);
