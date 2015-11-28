@@ -171,7 +171,7 @@ task prettyLights() {
 }
 
 /** Pre autonomous task (who actually uses this?).
-May put in some pretty flashing indicator lights **/
+    May put in some pretty flashing indicator lights **/
 void pre_auton() {
   bStopTasksBetweenModes = true;
 
