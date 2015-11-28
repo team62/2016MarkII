@@ -1,3 +1,11 @@
+#pragma config(Sensor, dgtl1,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl2,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl3,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl4,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl5,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl6,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl7,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl8,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl10, ballIntake,     sensorTouch)
 #pragma config(Sensor, dgtl11, leftCatapult,   sensorTouch)
 #pragma config(Sensor, dgtl12, rightCatapult,  sensorTouch)
@@ -81,10 +89,12 @@ void pre_auton() {
 
 }
 
-/** Controlls the cataptult for regular field use **/
-int catapultDelay = 150; //delay for cycle to start reading sensor
+/* Globals for Catapult */
+int catapultDelay = 250; //delay for cycle to start reading sensor
 int catapultHoldPower = 20; //Power to keep catapult in same place - was 15
+int ballLoadDelay = 2000; //Delay for the ball to be loaded by human drivervalidateLongAddresvalidateLongAddress
 
+/** Controlls the cataptult for regular field use **/
 task primeCatapult () {
 	while(!SensorValue[rightCatapult]) {
   	setCatapultSpeed(127);
@@ -94,6 +104,7 @@ task primeCatapult () {
   stopTask(primeCatapult);
 }
 
+/** Prepares the catapult to be shot. **/
 task catapultKick() {
   while(true) {
     if(VexRT(Btn6U)) {
@@ -107,7 +118,6 @@ task catapultKick() {
 }
 
 /** Controlls the catapult for driver loads and autonomous **/
-int ballLoadDelay = 1000; //Delay for the ball to be loaded by human driver.
 task catapultKickUserLoad() {
   while(true) {
     setCatapultSpeed(127);
@@ -117,6 +127,21 @@ task catapultKickUserLoad() {
     setCatapultSpeed(catapultHoldPower);
   wait1Msec(ballLoadDelay);
   }
+}
+int lightsWaitTime = 50;
+/** Pretty Lights. Nuff said. **/
+task prettyLights() {
+	while(true) {
+		for(int i = 8; i<=16; i++) {
+			sensorValue[i] = 1;
+			//sensorValue[((i-4)%8)+8] = 0;
+			wait1Msec(lightsWaitTime);
+		}
+		for(int i = 8; i<=16; i++) {
+			sensorValue[i] = 0;
+			wait1Msec(lightsWaitTime);
+		}
+	}
 }
 
 /** Autonomous task - 15 seconds **/
@@ -143,12 +168,15 @@ Btn7D             = auto align with gyro (not necessary yet)
 */
 /** Usercontrol task **/
 task usercontrol() {
+	startTask(prettyLights);
 	startTask(catapultKick);
   while (true) {
-    if(VexRT(Btn8D))
+    if(VexRT(Btn8D)) {
       startTask(catapultKickUserLoad);
-    else if(VexRT(Btn8U))
+  	} else if(VexRT(Btn8U)) {
       stopTask(catapultKickUserLoad);
+      setCatapultSpeed(0);
+    }
 
 
     if(SensorValue[ballIntake] && !VexRT(Btn6U))
