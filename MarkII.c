@@ -29,6 +29,21 @@
 
 #include "Vex_Competition_Includes.c"   //Main competition background code...do not modify!
 
+/*///////////////////////////////////////////////////////////
+/////____________/\\\\\____/\\\\\\\\\_____              /////
+///// ________/\\\\////___/\\\///////\\\___             /////
+/////  _____/\\\///_______\///______\//\\\__            /////
+/////   ___/\\\\\\\\\\\______________/\\\/___           /////
+/////    __/\\\\///////\\\_________/\\\//_____          /////
+/////     _\/\\\______\//\\\_____/\\\//________         /////
+/////      _\//\\\______/\\\____/\\\/___________        /////
+/////       __\///\\\\\\\\\/____/\\\\\\\\\\\\\\\_       /////
+/////        ____\/////////_____\///////////////__      /////
+///// Mark II Robot                                     /////
+///// Authors: Jonathan Damico                          /////
+///// Since: Nov. 27, 2015                              /////
+*////////////////////////////////////////////////////////////
+
 /** Sets the speeds of all the left wheels. **/
 void setLeftWheelSpeed (int speed) {
   motor[leftWheel1]   = speed;
@@ -43,6 +58,7 @@ void setRightWheelSpeed (int speed) {
   motor[rightWheel3]  = speed;
 }
 
+//Intake is on back of robot
 /** Sets the speeds of all wheels. **/
 void setWheelSpeeds (int left, int right) {
   setLeftWheelSpeed(left);
@@ -137,6 +153,7 @@ task catapultKickUserLoad() {
   wait1Msec(ballLoadDelay);
   }
 }
+
 int lightsWaitTime = 50;
 /** Pretty Lights. Nuff said. **/
 task prettyLights() {
@@ -163,7 +180,7 @@ void pre_auton() {
 /** Autonomous task - 15 seconds.
     Moves forward after shooting driver loads **/
 task autonomous() {
-	SensorValue[gyro] = 0; //Calibrates Gyro
+  SensorValue[gyro] = 0; //Calibrates Gyro
   clearTimer(T1);
   startTask(catapultKickUserLoad);
   while(time1[T1]<5000) {} //Time to wait for shooting, needs to be as small as possible
