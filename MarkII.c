@@ -22,24 +22,23 @@ void setWheelSpeeds (int left, int right) {
 }
 
 void setLeftWheelSpeed (int speed) {
-  motor[leftWheel1] = speed;
-  motor[leftWheel2] = speed;
-  motor[leftWheel3] = speed;
+  motor[leftWheel1]   = speed;
+  motor[leftWheel2]   = speed;
+  motor[leftWheel3]   = speed;
 }
 
 void setRightWheelSpeed (int speed) {
-  motor[rightWheel1] = speed;
-  motor[rightWheel2] = speed;
-  motor[rightWheel3] = speed;
+  motor[rightWheel1]  = speed;
+  motor[rightWheel2]  = speed;
+  motor[rightWheel3]  = speed;
 }
 
 void setCatapultSpeed (int speed) {
-  motor[cataput1] = speed;
-  motor[cataput2] = speed;
-  motor[cataput3] = speed;
+  motor[cataput1]     = speed;
+  motor[cataput2]     = speed;
+  motor[cataput3]     = speed;
 }
 
-//tank drive
 void tankDrive () {
   //left wheels
   if(abs(vexRT(Ch3))<10) //deadbands
@@ -94,15 +93,37 @@ task catapultKickUserLoad() {
 }
 
 task autonomous() {
-
+  ClearTimer(T1);
+  startTask(catapultKickUserLoad);
+  while(time1[T1]<5000) {}
+  stopTask(catapultKickUserLoad);
+  setWheelSpeeds(127,127);
+  wait1Msec(1100);
+  setWheelSpeeds(0,0);
 }
 
+/*
+ch3               = run all right side motors
+ch2               = run all left side motors
+Btn5U             = 127 intake
+Btn5D             = -127 intake
+Btn6U tapped      = run catapults once in a cycle
+Btn6U holded down = full auto
+Btn8D             = run driver load shooter (basically full auto) - don’t have to run intake
+Btn8U             = stop driver load shooter
+Btn7D             = auto align with gyro (not necessary yet)
+*/
 task usercontrol() {
-
   while (true) {
     if(VexRT(Btn6U))
       startTask(catapultKick);
 
+    if(VexRT(Btn8D))
+      startTask(catapultKickUserLoad);
+    else if(VexRT(Btn8U))
+      stopTask(catapultKickUserLoad);
+
+    //Add Gyro - 7D
 
     tankDrive();
 
