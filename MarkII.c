@@ -1,3 +1,4 @@
+#pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl2,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl3,  ,               sensorLEDtoVCC)
@@ -56,6 +57,16 @@ void setCatapultSpeed (int speed) {
   motor[catapult3]     = speed;
 }
 
+/** Spins the robot in a direction. **/
+void spin (int velocity) {
+	motor[leftWheel1] = -velocity;
+	motor[leftWheel2] = -velocity;
+	motor[leftWheel3] = -velocity;
+	motor[rightWheel1] = velocity;
+	motor[rightWheel2] = velocity;
+	motor[rightWheel3] = velocity;
+}
+
 /** Controlls the drivebase. **/
 void tankDrive () {
 
@@ -74,9 +85,9 @@ void tankDrive () {
 
 /** Controlls the intake for balls. Currently not toggle, can easialy be. **/
 void intakeControl() {
-  if(VexRT(Btn5U))
+  if(vexRT(Btn5U))
     motor[intake] = 127;
-  else if(VexRT(Btn5D))
+  else if(vexRT(Btn5D))
     motor[intake] = -127;
   else
     motor[intake] = 0;
@@ -87,6 +98,19 @@ May put in some pretty flashing indicator lights **/
 void pre_auton() {
   bStopTasksBetweenModes = true;
 
+}
+
+/** Orients robot with gryo **/
+void orient() {
+	while(abs(SensorValue[gyro])>10) {
+		if(SensorValue[gyro] > 50)
+			spin(-50);
+		else if(SensorValue[gyro] < -50)
+			spin(50);
+		else
+			spin(SensorValue[gyro]/1270*127+20);
+	}
+	spin(0);
 }
 
 /* Globals for Catapult */
@@ -107,7 +131,7 @@ task primeCatapult () {
 /** Prepares the catapult to be shot. **/
 task catapultKick() {
   while(true) {
-    if(VexRT(Btn6U)) {
+    if(vexRT(Btn6U)) {
     	stopTask(primeCatapult);
       setCatapultSpeed(127);
       wait1Msec(catapultDelay); //May not need
@@ -133,12 +157,12 @@ int lightsWaitTime = 50;
 task prettyLights() {
 	while(true) {
 		for(int i = 8; i<=16; i++) {
-			sensorValue[i] = 1;
+			SensorValue[i] = 1;
 			//sensorValue[((i-4)%8)+8] = 0;
 			wait1Msec(lightsWaitTime);
 		}
 		for(int i = 8; i<=16; i++) {
-			sensorValue[i] = 0;
+			SensorValue[i] = 0;
 			wait1Msec(lightsWaitTime);
 		}
 	}
@@ -146,7 +170,7 @@ task prettyLights() {
 
 /** Autonomous task - 15 seconds **/
 task autonomous() {
-  ClearTimer(T1);
+  clearTimer(T1);
   startTask(catapultKickUserLoad);
   while(time1[T1]<5000) {}
   stopTask(catapultKickUserLoad);
@@ -165,28 +189,34 @@ Btn6U holded down = full auto
 Btn8D             = run driver load shooter (basically full auto) - don’t have to run intake
 Btn8U             = stop driver load shooter
 Btn7D             = auto align with gyro (not necessary yet)
+Btn7U             = calibrate gryo
 */
 /** Usercontrol task **/
 task usercontrol() {
 	startTask(prettyLights);
 	startTask(catapultKick);
   while (true) {
-    if(VexRT(Btn8D)) {
+    if(vexRT(Btn8D)) {
       startTask(catapultKickUserLoad);
-  	} else if(VexRT(Btn8U)) {
+  	} else if(vexRT(Btn8U)) {
       stopTask(catapultKickUserLoad);
       setCatapultSpeed(0);
     }
 
 
-    if(SensorValue[ballIntake] && !VexRT(Btn6U))
+    if(SensorValue[ballIntake] && !vexRT(Btn6U))
     	startTask(primeCatapult);
 
-    //Add Gyro - 7D
+    //Gyro - 7D
+    if(vexRT(Btn7D))
+			orient();
 
-    tankDrive();
+		if(vexRT(Btn7U))
+			SensorValue[gyro] = 0;
 
-    intakeControl();
+    tankDrive(); //Controls drivebase
+
+    intakeControl(); //Controls intake
 
     //Anywhere from 25-50 Msec pause to prevent cortex overload
     wait1Msec(30);
