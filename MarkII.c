@@ -57,16 +57,6 @@ void setCatapultSpeed (int speed) {
   motor[catapult3]     = speed;
 }
 
-/** Spins the robot in a direction. **/
-void spin (int velocity) {
-	motor[leftWheel1] = -velocity;
-	motor[leftWheel2] = -velocity;
-	motor[leftWheel3] = -velocity;
-	motor[rightWheel1] = velocity;
-	motor[rightWheel2] = velocity;
-	motor[rightWheel3] = velocity;
-}
-
 /** Controlls the drivebase. **/
 void tankDrive () {
 
@@ -93,22 +83,17 @@ void intakeControl() {
     motor[intake] = 0;
 }
 
-/** Pre autonomous task (who actually uses this?).
-May put in some pretty flashing indicator lights **/
-void pre_auton() {
-  bStopTasksBetweenModes = true;
-
-}
-
 /** Orients robot with gryo **/
 void orient() {
 	while(abs(SensorValue[gyro])>10) {
-		if(SensorValue[gyro] > 50)
-			spin(-50);
-		else if(SensorValue[gyro] < -50)
-			spin(50);
-		else
-			spin(SensorValue[gyro]/1270*127+20);
+		if(SensorValue[gyro] > 50) {
+      setWheelSpeeds(50,-50); //may need to be reversed
+		} else if(SensorValue[gyro] < -50) {
+			setWheelSpeeds(-50,50); //may need to be reversed
+		} else {
+			int spinValue = SensorValue[gyro]/1270*127+20);
+      setWheelSpeeds(-spinValue, spinValue);
+    }
 	}
 	spin(0);
 }
@@ -166,6 +151,13 @@ task prettyLights() {
 			wait1Msec(lightsWaitTime);
 		}
 	}
+}
+
+/** Pre autonomous task (who actually uses this?).
+May put in some pretty flashing indicator lights **/
+void pre_auton() {
+  bStopTasksBetweenModes = true;
+
 }
 
 /** Autonomous task - 15 seconds **/
