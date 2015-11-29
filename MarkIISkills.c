@@ -104,17 +104,17 @@ void intakeControl() {
 
 /** Orients robot with gryo **/
 void orient() {
-	while(abs(SensorValue[gyro])>10) {
-		if(SensorValue[gyro] > 50) {
+  while(abs(SensorValue[gyro])>10) {
+    if(SensorValue[gyro] > 50) {
       setWheelSpeeds(50,-50); //may need to be reversed
-		} else if(SensorValue[gyro] < -50) {
-			setWheelSpeeds(-50,50); //may need to be reversed
-		} else {
-			int spinValue = SensorValue[gyro]/1270*127+20);
+    } else if(SensorValue[gyro] < -50) {
+      setWheelSpeeds(-50,50); //may need to be reversed
+    } else {
+      int spinValue = SensorValue[gyro]/1270*127+20);
       setWheelSpeeds(-spinValue, spinValue);
     }
-	}
-	spin(0);
+  }
+  setWheelSpeed(0,0);
 }
 
 /* Globals for Catapult */
@@ -124,9 +124,9 @@ int ballLoadDelay = 2000; //Delay for the ball to be loaded by human drivervalid
 
 /** Controlls the cataptult for regular field use **/
 task primeCatapult () {
-	while(!SensorValue[rightCatapult]) {
-  	setCatapultSpeed(127);
-  	wait1Msec(30);
+  while(!SensorValue[rightCatapult]) {
+    setCatapultSpeed(127);
+    wait1Msec(30);
   }
   setCatapultSpeed(catapultHoldPower);
   stopTask(primeCatapult);
@@ -160,17 +160,17 @@ task catapultKickUserLoad() {
 int lightsWaitTime = 50;
 /** Pretty Lights. Nuff said. **/
 task prettyLights() {
-	while(true) {
-		for(int i = 8; i<=16; i++) {
-			SensorValue[i] = 1;
-			//sensorValue[((i-4)%8)+8] = 0;
-			wait1Msec(lightsWaitTime);
-		}
-		for(int i = 8; i<=16; i++) {
-			SensorValue[i] = 0;
-			wait1Msec(lightsWaitTime);
-		}
-	}
+  while(true) {
+    for(int i = 8; i<=16; i++) {
+      SensorValue[i] = 1;
+      //sensorValue[((i-4)%8)+8] = 0;
+      wait1Msec(lightsWaitTime);
+    }
+    for(int i = 8; i<=16; i++) {
+      SensorValue[i] = 0;
+      wait1Msec(lightsWaitTime);
+    }
+  }
 }
 
 /** Pre autonomous task.
@@ -257,26 +257,25 @@ Btn7U             = calibrate gryo
 */
 /** Usercontrol task **/
 task usercontrol() {
-	startTask(prettyLights);
-	startTask(catapultKick);
+  startTask(prettyLights);
+  startTask(catapultKick);
   while (true) {
     if(vexRT(Btn8D)) {
       startTask(catapultKickUserLoad);
-  	} else if(vexRT(Btn8U)) {
+    } else if(vexRT(Btn8U)) {
       stopTask(catapultKickUserLoad);
       setCatapultSpeed(0);
     }
 
-
     if(SensorValue[ballIntake] && !vexRT(Btn6U))
-    	startTask(primeCatapult);
+      startTask(primeCatapult);
 
     //Gyro - 7D
     if(vexRT(Btn7D))
-			orient();
+      orient();
 
-		if(vexRT(Btn7U))
-			SensorValue[gyro] = 0;
+    if(vexRT(Btn7U))
+      SensorValue[gyro] = 0;
 
     tankDrive(); //Controls drivebase
 

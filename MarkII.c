@@ -217,7 +217,6 @@ task usercontrol() {
       setCatapultSpeed(0);
     }
 
-
     if(SensorValue[ballIntake] && !vexRT(Btn6U))
       startTask(primeCatapult);
 
