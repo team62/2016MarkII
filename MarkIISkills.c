@@ -42,7 +42,7 @@
 /////       __\///\\\\\\\\\/____/\\\\\\\\\\\\\\\_       /////
 /////        ____\/////////_____\///////////////__      /////
 ///// Mark II Robot                                     /////
-///// Main Code                                         /////
+///// Driver Skills                                     /////
 ///// Authors: Jonathan Damico (jj_damico@yahoo.com)    /////
 ///// Since: Nov. 27, 2015                              /////
 *////////////////////////////////////////////////////////////
@@ -173,24 +173,74 @@ task prettyLights() {
 	}
 }
 
-/** Pre autonomous task (who actually uses this?).
-    May put in some pretty flashing indicator lights **/
+/** Pre autonomous task.
+    Calibrate SECOND goal by hitting button sensor **/
 void pre_auton() {
+  while(!SensorValue[gyroCalib]) {
+    SensorValue[8] = 1;   //Flash red light to indicate that we need to calibrate
+    wait1Msec(50);
+    SensorValue[8] = 0;
+    wait1Msec(50);
+  }
+  SensorValue[8] = 0;
+  SensorValue[9] = 1;     //Turn on steady amber light to indicate that we are calibrating
+  wait1Msec(2000);
+  SensorValue[gyro] = 0;
+  SensorValue[8] = 0;
+  SensorValue[10] = 1;    //Turn on steady green light to indicate that we have calibrated
   bStopTasksBetweenModes = true;
 
+}
+
+/** Controls lights so we know how much time is left in shooting for autonomous. **/
+task autonomousLights () {
+  while(true) {
+    if(time1[T1]<10000) {
+      SensorValue[8]  = 1;
+      SensorValue[9]  = 0;
+      SensorValue[10] = 0;
+    } else if (time1[T1<15000]) {
+      SensorValue[8]  = 0;
+      SensorValue[9]  = 1;
+      SensorValue[10] = 0;
+    } else {
+      SensorValue[8]  = 0;
+      SensorValue[9]  = 0;
+      SensorValue[10] = 1;
+    }
+    wait1Msec(200);
+  }
+}
+
+void autonomousMove () {
+  setWheelSpeeds(127,127);
+  wait1Msec(2000);
+  setWheelSpeeds(50,-50);
+  wait1Msec(2000);
+  setWheelSpeeds(-127,-127);
+  wait1Msec(2000);
+  setWheelSpeeds(0,0);
+}
+
+void autonomousShoot () {
+  clearTimer(T1);
+  startTask(catapultKickUserLoad);
+  startTask(autonomousLights);
+  while(time1[T1]<20000) {} //Time to wait for shooting, needs to be as small as possible
+  stopTask(catapultKickUserLoad);
+  stopTask(autonomousLights);
+  SensorValue[8]  = 0;
+  SensorValue[9]  = 0;
+  SensorValue[10] = 0;
 }
 
 /** Autonomous task - 15 seconds.
     Moves forward after shooting driver loads **/
 task autonomous() {
-  SensorValue[gyro] = 0; //Calibrates Gyro
-  clearTimer(T1);
-  startTask(catapultKickUserLoad);
-  while(time1[T1]<5000) {} //Time to wait for shooting, needs to be as small as possible
-  stopTask(catapultKickUserLoad);
-  setWheelSpeeds(127,127);
-  wait1Msec(1100);
-  setWheelSpeeds(0,0);
+  autonomousShoot();
+  autonomousMove();
+  orient();
+  autonomousShoot();
 }
 
 /*
