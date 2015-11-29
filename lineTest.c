@@ -1,4 +1,7 @@
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
+#pragma config(Sensor, in2,    lineLeft,       sensorLineFollower)
+#pragma config(Sensor, in3,    lineCenter,     sensorLineFollower)
+#pragma config(Sensor, in4,    lineRight,      sensorLineFollower)
 #pragma config(Sensor, dgtl1,  sonarOut,       sensorSONAR_raw)
 #pragma config(Motor,  port1,           rightWheel1,   tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           rightWheel2,   tmotorVex393_MC29, openLoop, reversed)
@@ -40,11 +43,7 @@ task calculateError() {
 	}
 }
 
-/*void orient() {
-	double Ki;
-	double Kp;
-	double Kd;
-
+void orient() {
 	while(abs(SensorValue[gyro])>10) {
 		if(SensorValue[gyro] > 50)
 			spin(-50);
@@ -56,45 +55,9 @@ task calculateError() {
 	spin(0);
 	playSound(soundBeepBeep);
 }
-*/
-
-float	Kp = 0.21;
-float	Ki = 0.03;
-float	Kd = 0.17;
-task orient () {
-	float error, integral, derivative, lastError;
-	int speed;
-
-	while (true) {
-			//P
-			error = 0 - SensorValue[gyro];
-
-			//I
-			if(error == 0)
-				integral = 0;
-			else if (abs(error)>10)
-				integral = 0;
-			else
-				integral += error;
-
-			//D
-			derivative = error - lastError;
-
-			lastError = error;
-
-
-			speed = Kp*error+Ki*integral+Kd*derivative;
-			if(speed>80)
-				speed = 80;
-			if(speed<-80)
-				speed = -80;
-
-			spin(speed);
-	}
-}
 
 task autonomous () {
-	startTask(orient);
+	orient();
 }
 
 task usercontrol() {
@@ -124,9 +87,7 @@ task usercontrol() {
 		}
 
 		if(vexRT(Btn5U))
-			startTask(orient);
-		else
-			stopTask(orient);
+			orient();
 
 		if(vexRT(Btn6U))
 			SensorValue[gyro] = 0;

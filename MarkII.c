@@ -7,6 +7,7 @@
 #pragma config(Sensor, dgtl6,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl7,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl8,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl9,  gyroCalib,      sensorTouch)
 #pragma config(Sensor, dgtl10, ballIntake,     sensorTouch)
 #pragma config(Sensor, dgtl11, leftCatapult,   sensorTouch)
 #pragma config(Sensor, dgtl12, rightCatapult,  sensorTouch)
@@ -30,6 +31,8 @@
 #pragma competitionControl(Competition)
 
 #include "Vex_Competition_Includes.c"   //Main competition background code...do not modify!
+
+bool lockMode = false;
 
 /*///////////////////////////////////////////////////////////
 /////____________/\\\\\____/\\\\\\\\\_____              /////
@@ -76,6 +79,12 @@ void setCatapultSpeed (int speed) {
   motor[catapult3]     = speed;
 }
 
+/** Locks the drivebase during shooting. **/
+void lock ( int speed = 15 ) {
+	motor[leftWheel2] = -speed;
+	motor[rightWheel2] = -speed;
+}
+
 /** Controlls the drivebase. **/
 void tankDrive () {
 
@@ -106,7 +115,7 @@ void orient() {
     } else if(SensorValue[gyro] < -50) {
       setWheelSpeeds(-50,50); //may need to be reversed
     } else {
-      int spinValue = SensorValue[gyro]/1270*127+20);
+      int spinValue = SensorValue[gyro]/1270*127+20;
       setWheelSpeeds(-spinValue, spinValue);
     }
   }
@@ -149,7 +158,8 @@ task catapultKickUserLoad() {
     while(!SensorValue[rightCatapult] && !SensorValue[leftCatapult])
       setCatapultSpeed(127);
     setCatapultSpeed(catapultHoldPower);
-  wait1Msec(ballLoadDelay);
+  	wait1Msec(ballLoadDelay);
+  	lockMode = true;
   }
 }
 
@@ -182,7 +192,8 @@ task autonomous() {
   SensorValue[gyro] = 0; //Calibrates Gyro
   clearTimer(T1);
   startTask(catapultKickUserLoad);
-  while(time1[T1]<5000) {} //Time to wait for shooting, needs to be as small as possible
+  while(time1[T1]<5000) //Time to wait for shooting, needs to be as small as possible
+  	lock();
   stopTask(catapultKickUserLoad);
   setWheelSpeeds(127,127);
   wait1Msec(1100);
@@ -200,21 +211,29 @@ Btn8D             = run driver load shooter (basically full auto) - don’t have
 Btn8U             = stop driver load shooter
 Btn7D             = auto align with gyro (not necessary yet)
 Btn7U             = calibrate gryo
+Btn7L							= lock wheels
 */
 /** Usercontrol task **/
 task usercontrol() {
-  startTask(prettyLights);
+  //startTask(prettyLights);
   startTask(catapultKick);
+  lockMode = false;
+  for (int i = 8; i<=16; i++)
+  	SensorValue[i] = 0;
   while (true) {
     if(vexRT(Btn8D)) {
       startTask(catapultKickUserLoad);
+      lockMode = true;
     } else if(vexRT(Btn8U)) {
       stopTask(catapultKickUserLoad);
       setCatapultSpeed(0);
+      lockMode = false;
     }
 
     if(SensorValue[ballIntake] && !vexRT(Btn6U))
       startTask(primeCatapult);
+
+    SensorValue[8] = lockMode;
 
     //Gyro - 7D
     if(vexRT(Btn7D))
@@ -223,7 +242,15 @@ task usercontrol() {
     if(vexRT(Btn7U))
       SensorValue[gyro] = 0;
 
-    tankDrive(); //Controls drivebase
+    if(vexRT(Btn7L)) {
+    	lockMode = !lockMode;
+    	while(vexRT(Btn7L)) {}
+    }
+
+    if(lockMode && abs(vexRT(Ch3))< 10  && abs(vexRT(Ch2)) < 10)
+    	lock(); //locks drivebase during shooting
+   	else
+   		tankDrive(); //Controls drivebase
 
     intakeControl(); //Controls intake
 

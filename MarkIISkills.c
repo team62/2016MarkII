@@ -7,6 +7,7 @@
 #pragma config(Sensor, dgtl6,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl7,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl8,  ,               sensorLEDtoVCC)
+#pragma config(Sensor, dgtl9,  gyroCalib,      sensorTouch)
 #pragma config(Sensor, dgtl10, ballIntake,     sensorTouch)
 #pragma config(Sensor, dgtl11, leftCatapult,   sensorTouch)
 #pragma config(Sensor, dgtl12, rightCatapult,  sensorTouch)
@@ -110,11 +111,11 @@ void orient() {
     } else if(SensorValue[gyro] < -50) {
       setWheelSpeeds(-50,50); //may need to be reversed
     } else {
-      int spinValue = SensorValue[gyro]/1270*127+20);
+      int spinValue = SensorValue[gyro]/1270*127+20;
       setWheelSpeeds(-spinValue, spinValue);
     }
   }
-  setWheelSpeed(0,0);
+  setWheelSpeeds(0,0);
 }
 
 /* Globals for Catapult */
