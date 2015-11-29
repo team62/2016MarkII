@@ -80,11 +80,11 @@ void setCatapultSpeed (int speed) {
 void tankDrive () {
 
   //left wheels
-  int leftWheels = abs(vexRT(Ch3))<10 ? 0 : vexRT(Ch3)
+  int leftWheels = abs(vexRT(Ch3))<10 ? 0 : vexRT(Ch3);
   setLeftWheelSpeed(leftWheels);
 
   //right wheels
-  int rightWheels = abs(vexRT(Ch2))<10 ? 0 : vexRT(Ch2)
+  int rightWheels = abs(vexRT(Ch2))<10 ? 0 : vexRT(Ch2);
   setRightWheelSpeed(rightWheels);
 }
 
