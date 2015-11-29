@@ -80,16 +80,12 @@ void setCatapultSpeed (int speed) {
 void tankDrive () {
 
   //left wheels
-  if(abs(vexRT(Ch3))<10) //deadbands
-    setLeftWheelSpeed(0);
-  else
-    setLeftWheelSpeed(vexRT(Ch3));
+  int leftWheels = abs(vexRT(Ch3))<10 ? 0 : vexRT(Ch3)
+  setLeftWheelSpeed(leftWheels);
 
   //right wheels
-  if(abs(vexRT(Ch2))<10) //deadbands
-    setRightWheelSpeed(0);
-  else
-    setRightWheelSpeed(vexRT(Ch2));
+  int rightWheels = abs(vexRT(Ch2))<10 ? 0 : vexRT(Ch2)
+  setRightWheelSpeed(rightWheels);
 }
 
 /** Controlls the intake for balls. Currently not toggle, can easialy be. **/
