@@ -71,7 +71,6 @@ void setWheelSpeeds (int left, int right) {
   setRightWheelSpeed(right);
 }
 
-//2 inv
 /** Sets all the catapult motors. **/
 void setCatapultSpeed (int speed) {
   motor[catapult1]     = speed;

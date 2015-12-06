@@ -58,9 +58,9 @@ task calculateError() {
 }
 */
 
-float	Kp = 0.21;
-float	Ki = 0.03;
-float	Kd = 0.17;
+float	Kp = 0.1;
+float	Ki = 0.18;
+float	Kd = 0.16;
 task orient () {
 	float error, integral, derivative, lastError;
 	int speed;
@@ -84,11 +84,16 @@ task orient () {
 
 
 			speed = Kp*error+Ki*integral+Kd*derivative;
-			if(speed>80)
-				speed = 80;
-			if(speed<-80)
-				speed = -80;
-
+			if(speed>-5 && speed<5)
+				speed = 0;
+			else if(speed>127)
+				speed = 127;
+			else if(speed<-127)
+				speed = -127;
+			else if(speed<19 && speed>0)
+				speed = 19;
+			else if(speed>-19 && speed<0)
+				speed = -19;
 			spin(speed);
 	}
 }
