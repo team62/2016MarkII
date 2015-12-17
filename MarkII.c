@@ -91,8 +91,20 @@ void lock ( int speed = 15 ) {
 #warning "tankDrive"
 /** Controlls the drivebase. **/
 void tankDrive () {
-  setLeftWheelSpeed(abs(vexRT(Ch3))<10 ? 0 : vexRT(Ch3));
-  setRightWheelSpeed(abs(vexRT(Ch2))<10 ? 0 : vexRT(Ch2));
+
+	int rawLeft = vexRT(Ch3);
+	int rawRight = vexRT(Ch2);
+
+	if( rawLeft > 0 )
+		setLeftWheelSpeed( rawLeft*rawLeft < 10 ? 0 : rawLeft*rawLeft/127 );
+	else
+		setLeftWheelSpeed( rawLeft*rawLeft < 10 ? 0 : rawLeft*rawLeft/-127 );
+
+	if( rawRight > 0 )
+		setRightWheelSpeed( rawRight*rawRight < 10 ? 0 : rawRight*rawRight/127 );
+	else
+		setRightWheelSpeed( rawRight*rawRight < 10 ? 0 : rawRight*rawRight/-127 );
+
 }
 
 #warning "intakeControl"
