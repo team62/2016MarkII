@@ -96,14 +96,14 @@ void tankDrive () {
 	int rawRight = vexRT(Ch2);
 
 	if( rawLeft > 0 )
-		setLeftWheelSpeed( rawLeft*rawLeft < 10 ? 0 : rawLeft*rawLeft/127 );
+		setLeftWheelSpeed( rawLeft*rawLeft < 3 ? 0 : rawLeft*rawLeft/127 );
 	else
-		setLeftWheelSpeed( rawLeft*rawLeft < 10 ? 0 : rawLeft*rawLeft/-127 );
+		setLeftWheelSpeed( rawLeft*rawLeft < 3 ? 0 : rawLeft*rawLeft/-127 );
 
 	if( rawRight > 0 )
-		setRightWheelSpeed( rawRight*rawRight < 10 ? 0 : rawRight*rawRight/127 );
+		setRightWheelSpeed( rawRight*rawRight < 3 ? 0 : rawRight*rawRight/127 );
 	else
-		setRightWheelSpeed( rawRight*rawRight < 10 ? 0 : rawRight*rawRight/-127 );
+		setRightWheelSpeed( rawRight*rawRight < 3 ? 0 : rawRight*rawRight/-127 );
 
 }
 
