@@ -50,6 +50,7 @@ bool lockMode = false;
 ///// Since: Nov. 27, 2015                              /////
 *////////////////////////////////////////////////////////////
 
+#warning "setLeftWheelSpeed"
 /** Sets the speeds of all the left wheels. **/
 void setLeftWheelSpeed (int speed) {
   motor[leftWheel1]   = speed;
@@ -57,6 +58,7 @@ void setLeftWheelSpeed (int speed) {
   motor[leftWheel3]   = speed;
 }
 
+#warning "setRightWheelSpeeds"
 /** Sets the speeds of all the right wheels. **/
 void setRightWheelSpeed (int speed) {
   motor[rightWheel1]  = speed;
@@ -65,30 +67,35 @@ void setRightWheelSpeed (int speed) {
 }
 
 //Intake is on back of robot
+#warning "setWheelSpeeds"
 /** Sets the speeds of all wheels. **/
 void setWheelSpeeds (int left, int right) {
   setLeftWheelSpeed(left);
   setRightWheelSpeed(right);
 }
 
+#warning "setCatapultSpeed"
 /** Sets all the catapult motors. **/
 void setCatapultSpeed (int speed) {
   motor[catapult1]     = speed;
   motor[catapult2]     = speed;
 }
 
+#warning "lock"
 /** Locks the drivebase during shooting. **/
 void lock ( int speed = 15 ) {
 	motor[leftWheel2] = -speed;
 	motor[rightWheel2] = -speed;
 }
 
+#warning "tankDrive"
 /** Controlls the drivebase. **/
 void tankDrive () {
   setLeftWheelSpeed(abs(vexRT(Ch3))<10 ? 0 : vexRT(Ch3));
   setRightWheelSpeed(abs(vexRT(Ch2))<10 ? 0 : vexRT(Ch2));
 }
 
+#warning "intakeControl"
 /** Controlls the intake for balls. Currently not toggle, can easialy be. **/
 void intakeControl() {
   if(vexRT(Btn5U))
@@ -99,10 +106,11 @@ void intakeControl() {
     motor[intake] = 0;
 }
 
+#warning "orient"
 /** Orients robot with gryo **/
-float	Kp = 0.1;
-float	Ki = 0.18;
-float	Kd = 0.16;
+float	Kp = 0.05;
+float	Ki = 0.22;
+float	Kd = 0.07;
 task orient () {
 	float error, integral, derivative, lastError;
 	int speed;
@@ -133,9 +141,9 @@ task orient () {
 			else if(speed<-127)
 				speed = -127;
 			else if(speed<19 && speed>0)
-				speed = 19;
+				speed = 21;
 			else if(speed>-19 && speed<0)
-				speed = -19;
+				speed = -21;
 			setWheelSpeeds(-speed,speed);
 	}
 }
@@ -145,6 +153,7 @@ int catapultDelay = 250; //delay for cycle to start reading sensor
 int catapultHoldPower = 20; //Power to keep catapult in same place - was 15
 int ballLoadDelay = 2000; //Delay for the ball to be loaded by human drivervalidateLongAddresvalidateLongAddress
 
+#warning "primeCatapult"
 /** Prepares the catapult to be shot. **/
 task primeCatapult () {
 	while(!SensorValue[leftCatapult]) {
@@ -155,6 +164,7 @@ task primeCatapult () {
   stopTask(primeCatapult);
 }
 
+#warning "catapultKick"
 /** Controls manual catapult use. **/
 task catapultKick() {
   while(true) {
@@ -168,6 +178,7 @@ task catapultKick() {
   }
 }
 
+#warning "catapultKickUserLoad"
 /** Controlls the catapult for driver loads and autonomous **/
 task catapultKickUserLoad() {
   while(true) {
@@ -181,6 +192,7 @@ task catapultKickUserLoad() {
   }
 }
 
+#warning "lightsWaitTime"
 int lightsWaitTime = 50;
 /** Pretty Lights. Nuff said. **/
 task prettyLights() {
