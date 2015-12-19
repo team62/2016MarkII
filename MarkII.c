@@ -169,7 +169,7 @@ int ballLoadDelay = 2000; //Delay for the ball to be loaded by human drivervalid
 #warning "primeCatapult"
 /** Prepares the catapult to be shot. **/
 task primeCatapult () {
-	while(SensorValue[leftCatapult]>1900) {
+	while(SensorValue[leftCatapult]>2250) {
     setCatapultSpeed(127);
     wait1Msec(30);
   }
