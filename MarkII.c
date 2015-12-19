@@ -1,4 +1,5 @@
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
+#pragma config(Sensor, in8,    leftCatapult,   sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl2,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl3,  ,               sensorLEDtoVCC)
@@ -9,7 +10,6 @@
 #pragma config(Sensor, dgtl8,  ,               sensorLEDtoVCC)
 #pragma config(Sensor, dgtl9,  gyroCalib,      sensorTouch)
 #pragma config(Sensor, dgtl10, ballIntake,     sensorTouch)
-#pragma config(Sensor, dgtl11, leftCatapult,   sensorTouch)
 #pragma config(Sensor, dgtl12, rightCatapult,  sensorTouch)
 #pragma config(Motor,  port1,           rightWheel1,   tmotorVex393TurboSpeed_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           rightWheel2,   tmotorVex393TurboSpeed_MC29, openLoop, reversed)
@@ -169,7 +169,7 @@ int ballLoadDelay = 2000; //Delay for the ball to be loaded by human drivervalid
 #warning "primeCatapult"
 /** Prepares the catapult to be shot. **/
 task primeCatapult () {
-	while(!SensorValue[leftCatapult]) {
+	while(SensorValue[leftCatapult]>1900) {
     setCatapultSpeed(127);
     wait1Msec(30);
   }
@@ -195,6 +195,7 @@ task catapultKick() {
 /** Controlls the catapult for driver loads and autonomous **/
 task catapultKickUserLoad() {
   while(true) {
+  	stopTask(primeCatapult); //Stop robot from destroying itself
     setCatapultSpeed(127);
     wait1Msec(catapultDelay); //May not need
     while(!SensorValue[rightCatapult] && !SensorValue[leftCatapult])
